@@ -37,3 +37,16 @@ history = model.fit_generator(
       callbacks=callbacks_list,
       verbose=2)
 '''
+
+def poly_decay(epoch):
+	# initialize the maximum # of epochs, base learning rate,
+	# and power of the polynomial
+	maxEpochs = num_epochs
+	baseLR = init_lr
+	power = 1.0  # turns our polynomial decay into a linear decay
+ 
+	# compute the new learning rate based on polynomial decay
+	alpha = baseLR * (1 - (epoch / float(maxEpochs))) ** power
+ 
+	# return the new learning rate
+	return alpha

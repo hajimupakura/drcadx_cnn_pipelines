@@ -3,7 +3,7 @@ from keras.callbacks import LearningRateScheduler
 from keras.optimizers import SGD
 from keras.models import model_from_json
 from cnn.resnet import ResNet
-from cnn import config
+from resources.config import app_config as config
 from sklearn.metrics import classification_report
 from imutils import paths
 import matplotlib.pyplot as plt
@@ -42,9 +42,10 @@ def poly_decay(epoch):
 	return alpha
 
 # determine the # of image paths in training/validation/testing directories
-totalTrain = len(list(paths.list_images(config.train_path)))
-totalVal = len(list(paths.list_images(config.val_path)))
-totalTest = len(list(paths.list_images(config.test_path)))
+config_path = config['resnet34'] 
+totalTrain = len(list(paths.list_images(config_path['train_path'])))
+totalVal = len(list(paths.list_images(config_path['val_path'])))
+totalTest = len(list(paths.list_images(config_path['test_path'])))
 
 # initialize the training data augmentation object
 # randomly shifts, translats, and flips each training sample
