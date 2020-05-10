@@ -6,7 +6,7 @@ app_config = {
   },
   "default":{
    "inceptionv3": {
-       "img_width": 256;
+       "img_width": 256,
        "img_height": 256,
        "channels": 3,
        "stride": 1,
