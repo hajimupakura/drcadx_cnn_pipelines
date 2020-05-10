@@ -19,8 +19,8 @@ def mobilenet_architecture():
     # Imprting the model
     from keras.applications.mobilenet import MobileNet
     
-	fine_tune = config['mobilenet']['fine_tune']
-	layer_trainable_idx_point = config['mobilenet']['layer_trainable_idx_point']
+	fine_tune = config['default']['mobilenet']['fine_tune']
+	layer_trainable_idx_point = config['default']['mobilenet']['layer_trainable_idx_point']
     # Pre-build model
     base_model = MobileNet(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
 
@@ -30,10 +30,10 @@ def mobilenet_architecture():
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    mobilenet_model = Model(base_model.input, output)
+    model = Model(base_model.input, output)
 	
 	#Finetune or not
-	if fine_tune = 'True':
+	if fine_tune == 'True':
 	    for layer in model.layers:
             layer.trainable=False
     else:
@@ -46,7 +46,7 @@ def mobilenet_architecture():
     #mobilenet_model.summary()
     
     # Compiling the model
-    mobilenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
 
@@ -60,8 +60,8 @@ def inception_architecture():
     # Imprting the model 
     from keras.applications.inception_v3 import InceptionV3
     
-	fine_tune = config['inceptionv3']['fine_tune']
-	layer_trainable_idx_point = config['inceptionv3']['layer_trainable_idx_point']
+	fine_tune = config['default']['inceptionv3']['fine_tune']
+	layer_trainable_idx_point = config['default']['inceptionv3']['layer_trainable_idx_point']
     # Pre-build model
     base_model = InceptionV3(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
 
@@ -71,10 +71,10 @@ def inception_architecture():
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    inception_model = Model(base_model.input, output)
+    model = Model(base_model.input, output)
     
 	#Finetune or not
-	if fine_tune = 'True':
+	if fine_tune == 'True':
 	    for layer in model.layers:
             layer.trainable=False
     else:
@@ -87,7 +87,7 @@ def inception_architecture():
     #inception_model.summary()
     
     # Compiling the model
-    inception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
     
@@ -101,8 +101,8 @@ def densenet_architecture(version):
     # Imprting the model 
     from keras.applications.densenet import densenet_version
     
-	fine_tune = config['densenet']['fine_tune']
-	layer_trainable_idx_point = config['densenet']['layer_trainable_idx_point']
+	fine_tune = config['default']['densenet']['fine_tune']
+	layer_trainable_idx_point = config['default']['densenet']['layer_trainable_idx_point']
     # Pre-build model
     base_model = densenet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
 
@@ -112,10 +112,10 @@ def densenet_architecture(version):
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    inception_model = Model(base_model.input, output)
+    model = Model(base_model.input, output)
     
 	#Finetune or not
-	if fine_tune = 'True':
+	if fine_tune == 'True':
 	    for layer in model.layers:
             layer.trainable=False
     else:
@@ -128,7 +128,7 @@ def densenet_architecture(version):
     #inception_model.summary()
     
     # Compiling the model
-    densenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
     
@@ -142,10 +142,10 @@ def resnet_architecture(version):
     # Imprting the model 
     from keras.applications.densenet import resnet_version
     
-	fine_tune = config['resnet']['fine_tune']
-	layer_trainable_idx_point = config['resnet']['layer_trainable_idx_point']
+	fine_tune = config['default']['resnet']['fine_tune']
+	layer_trainable_idx_point = config['default']['resnet']['layer_trainable_idx_point']
     # Pre-build model
-    base_model = resnet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
+    model = resnet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
 
     # Adding output layers
     x = base_model.output
@@ -153,10 +153,10 @@ def resnet_architecture(version):
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    inception_model = Model(base_model.input, output)
+    model = Model(base_model.input, output)
     
 	#Finetune or not
-	if fine_tune = 'True':
+	if fine_tune == 'True':
 	    for layer in model.layers:
             layer.trainable=False
     else:
@@ -182,8 +182,8 @@ def xception_architecture():
     # Imprting the model
     from keras.applications.xception import Xception
     
-	fine_tune = config['xception']['fine_tune']
-	layer_trainable_idx_point = config['xception']['layer_trainable_idx_point']
+	fine_tune = config['default']['xception']['fine_tune']
+	layer_trainable_idx_point = config['default']['xception']['layer_trainable_idx_point']
     # Pre-build model
     base_model = Xception(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
 
@@ -193,10 +193,10 @@ def xception_architecture():
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    xception_model = Model(base_model.input, output)
+    model = Model(base_model.input, output)
     
 	#Finetune or not
-	if fine_tune = 'True':
+	if fine_tune == 'True':
 	    for layer in model.layers:
             layer.trainable=False
     else:
@@ -209,7 +209,7 @@ def xception_architecture():
     #xception_model.summary()
     
     # Compiling the model
-    xception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                            loss = loss, 
                            metrics = ['accuracy'])
 
@@ -217,7 +217,7 @@ def xception_architecture():
 	
 # Actual Train
 
-define main(model_name, train_path, val_path, test_path, loss_func):
+def main(model_name, train_path, val_path, test_path, loss_func):
     # model is the name of the model you want to use
     
 	# Extract / Load dictionary
@@ -245,10 +245,13 @@ define main(model_name, train_path, val_path, test_path, loss_func):
 	# This is for Resnet or Densenet
     version = base_mod_dict['version']
 	weights_model_name = base_mod_dict['weights_model_name']
-	model_save_path = base_mod_dict['model_weights_save_path]
+	model_save_path = base_mod_dict['model_weights_save_path']
 	step_decay_lr = base_mod_dict['step_decay_lr']
 	poly_decay_lr = base_mod_dict['poly_decay_lr']
 	earlychkpt_patience = base_mod_dict['earlychkpt_patience']
+    class_mode = base_mod_dict['class_mode'][0]
+    channels = base_mod_dict['channels']
+    learning_rate = base_mod_dict['learning_rate']
 	
 	# Loss
 	if loss_func == 'crossentropy':
@@ -260,9 +263,9 @@ define main(model_name, train_path, val_path, test_path, loss_func):
 	    loss = base_mod_dict['loss'][2]
 		class_mode = base_mod_dict['class_mode'][1]
 	# determine the # of image paths in training/validation/testing directories
-    totalTrain = len(list(paths.list_images(base_mod_dict['train_path'])))
-    totalVal = len(list(paths.list_images(base_mod_dict'val_path'])))
-    totalTest = len(list(paths.list_images(base_mod_dict['test_path'])))
+    totalTrain = len(list(paths.list_images(train_path)))
+    totalVal = len(list(paths.list_images(val_path)))
+    totalTest = len(list(paths.list_images(test_path)))
     
     # initialize the training data augmentation object
     # randomly shifts, translats, and flips each training sample
@@ -285,7 +288,7 @@ define main(model_name, train_path, val_path, test_path, loss_func):
     
     # initialize the training generator
     trainGen = trainAug.flow_from_directory(
-    	config.train_path,
+    	train_path,
     	class_mode=class_mode,
     	target_size=(img_width,  img_height),
     	shuffle=True,
@@ -293,7 +296,7 @@ define main(model_name, train_path, val_path, test_path, loss_func):
      
     # initialize the validation generator
     valGen = valAug.flow_from_directory(
-    	config.val_path,
+    	val_path,
     	class_mode=class_mode,
     	target_size=(img_width,  img_height),
     	shuffle=False,
@@ -301,7 +304,7 @@ define main(model_name, train_path, val_path, test_path, loss_func):
      
     # initialize the testing generator
     testGen = valAug.flow_from_directory(
-    	config.test_path,
+    	test_path,
     	class_mode=class_mode,
     	target_size=(img_width,  img_height),
     	shuffle=False,
@@ -329,11 +332,11 @@ define main(model_name, train_path, val_path, test_path, loss_func):
 							   
     
 	# LearningRateScheduler
-	if poly_decay_lr = 'True' and step_decay_lr = 'True':
+	if poly_decay_lr == 'True' and step_decay_lr == 'True':
 	    raise Exception("Sorry, you can only use one LearningRateScheduler!!! Make sure only one is set to True in the config file")   
-	if poly_decay_lr = 'True':
+	if poly_decay_lr == 'True':
 	    callbacks = [LearningRateScheduler(poly_decay),earlycheckpoint, checkpointer]
-    elif step_decay_lr = 'True':
+    elif step_decay_lr == 'True':
 	    callbacks = [LearningRateScheduler(step_decay),earlycheckpoint, checkpointer]		
     else:
 	    callbacks = [checkpointer]
@@ -345,7 +348,7 @@ define main(model_name, train_path, val_path, test_path, loss_func):
     	validation_data=valGen,
     	validation_steps=totalVal // batch_size,
     	epochs=num_epochs,
-    	callbacks=callbacks
+    	callbacks=callbacks,
 		verbose = 2)
     	
     

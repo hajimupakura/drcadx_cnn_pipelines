@@ -22,13 +22,13 @@ app_config = {
        "optimizer": ['sgd', 'adam', 'rmsprop', 'adagrad'],
        "class_mode": ['binary', 'categorical'],
        "learning_rate": 0.0001,
-       'earlychkpt_patience': 10
+       'earlychkpt_patience': 10,
        "step_decay_lr": '', # Please make sure the value is empty string if you don't want to use this. Otherwise set it to True
        "poly_decay_lr": '', # Please make sure the value is empty string if you don't want to use this. Otherwise set it to True
        "base_path": '',
        "train_split": 0.8,
        "val_split": 0.1,
-       "loss_accuracy_plot_path": '' # This is for resnet34
+       "loss_accuracy_plot_path": '', # This is for resnet34
        "version": 121, # if resnet or densenet specify version (121, 169, 201) 
        "fine_tune": True,
        "layer_trainable_idx_point": 16,
@@ -36,7 +36,7 @@ app_config = {
        "non_disease_label": 'Normal'
    },
     "resnet34": {
-       "img_width": 64;
+       "img_width": 64,
        "img_height": 64,
        "channels": 3,
        "stride": 1,
