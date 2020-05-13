@@ -232,123 +232,124 @@ def main(model_name, train_path, val_path, test_path, loss_func):
     elif model_name == 'xception':
 	    base_mod_dict = config['xception']
 		
-		
-    # defining constants and variables
-    img_width = base_mod_dict['img_width']
-    img_height = base_mod_dict['img_height']
-    train_data_dir = train_path
-    validation_data_dir = val_path
-    test_data_dir = test_path
-    output_classes = base_mod_dict['output_classes']
-    batch_size = base_mod_dict['batch_size']
-    num_epochs = base_mod_dict['num_epochs']
-	# This is for Resnet or Densenet
-    version = base_mod_dict['version']
-	weights_model_name = base_mod_dict['weights_model_name']
-	model_save_path = base_mod_dict['model_weights_save_path']
-	step_decay_lr = base_mod_dict['step_decay_lr']
-	poly_decay_lr = base_mod_dict['poly_decay_lr']
-	earlychkpt_patience = base_mod_dict['earlychkpt_patience']
-    class_mode = base_mod_dict['class_mode'][0]
-    channels = base_mod_dict['channels']
-    learning_rate = base_mod_dict['learning_rate']
-	
-	# Loss
-	if loss_func == 'crossentropy':
-	    loss = base_mod_dict['loss'][0]
-	elif loss_func == 'binary_crossentropy':
-	    loss = base_mod_dict['loss'][1]
-		class_mode = base_mod_dict['class_mode'][0]
-	elif loss_func == 'categorical_crossentropy':
-	    loss = base_mod_dict['loss'][2]
-		class_mode = base_mod_dict['class_mode'][1]
-	# determine the # of image paths in training/validation/testing directories
-    totalTrain = len(list(paths.list_images(train_path)))
-    totalVal = len(list(paths.list_images(val_path)))
-    totalTest = len(list(paths.list_images(test_path)))
+	    	
+        # defining constants and variables
+        # defining constants and variables
+        img_width = base_mod_dict['img_width']
+        img_height = base_mod_dict['img_height']
+        train_data_dir = train_path
+        validation_data_dir = val_path
+        test_data_dir = test_path
+        output_classes = base_mod_dict['output_classes']
+        batch_size = base_mod_dict['batch_size']
+        num_epochs = base_mod_dict['num_epochs']
+	    # This is for Resnet or Densenet
+        version = base_mod_dict['version']
+	    weights_model_name = base_mod_dict['weights_model_name']
+	    model_save_path = base_mod_dict['model_weights_save_path']
+	    step_decay_lr = base_mod_dict['step_decay_lr']
+	    poly_decay_lr = base_mod_dict['poly_decay_lr']
+	    earlychkpt_patience = base_mod_dict['earlychkpt_patience']
+        class_mode = base_mod_dict['class_mode'][0]
+        channels = base_mod_dict['channels']
+        learning_rate = base_mod_dict['learning_rate']
+	    
+	    # Loss
+	    if loss_func == 'crossentropy':
+	        loss = base_mod_dict['loss'][0]
+	    elif loss_func == 'binary_crossentropy':
+	        loss = base_mod_dict['loss'][1]
+	    	class_mode = base_mod_dict['class_mode'][0]
+	    elif loss_func == 'categorical_crossentropy':
+	        loss = base_mod_dict['loss'][2]
+	    	class_mode = base_mod_dict['class_mode'][1]
+	    # determine the # of image paths in training/validation/testing directories
+        totalTrain = len(list(paths.list_images(train_path)))
+        totalVal = len(list(paths.list_images(val_path)))
+        totalTest = len(list(paths.list_images(test_path)))
+        
+        # initialize the training data augmentation object
+        # randomly shifts, translats, and flips each training sample
+        # trainAug = ImageDataGenerator(
+        # 	rescale=1 / 255.0,
+        # 	rotation_range=20,
+        # 	zoom_range=0.05,
+        # 	width_shift_range=0.05,
+        # 	height_shift_range=0.05,
+        # 	shear_range=0.05,
+        # 	horizontal_flip=True,
+        # 	fill_mode="nearest")
     
-    # initialize the training data augmentation object
-    # randomly shifts, translats, and flips each training sample
-    # trainAug = ImageDataGenerator(
-    # 	rescale=1 / 255.0,
-    # 	rotation_range=20,
-    # 	zoom_range=0.05,
-    # 	width_shift_range=0.05,
-    # 	height_shift_range=0.05,
-    # 	shear_range=0.05,
-    # 	horizontal_flip=True,
-    # 	fill_mode="nearest")
-
-    trainAug = ImageDataGenerator(
-    	rescale=1 / 255.0,
-    	fill_mode="nearest")
-     
-    # initialize the validation (and testing) data augmentation object
-    valAug = ImageDataGenerator(rescale=1 / 255.0)
-    
-    # initialize the training generator
-    trainGen = trainAug.flow_from_directory(
-    	train_path,
-    	class_mode=class_mode,
-    	target_size=(img_width,  img_height),
-    	shuffle=True,
-    	batch_size=batch_size)
-     
-    # initialize the validation generator
-    valGen = valAug.flow_from_directory(
-    	val_path,
-    	class_mode=class_mode,
-    	target_size=(img_width,  img_height),
-    	shuffle=False,
-    	batch_size=batch_size)
-     
-    # initialize the testing generator
-    testGen = valAug.flow_from_directory(
-    	test_path,
-    	class_mode=class_mode,
-    	target_size=(img_width,  img_height),
-    	shuffle=False,
-    	batch_size=batch_size)
-    
-    # initialize our ResNet model and compile it
-	if model_name == 'inceptionv3':
-	    model = inception_architecture()
-	elif model_name == 'resnet':
-	    model = resnet_architecture(version)	
-	elif model_name == 'densenet':
-	    model = resnet_architecture(version)    
-	elif model_name == 'mobilenet':
-	    model = mobilenet_architecture()
-    elif model_name == 'xception':
-	    model = xception_architecture()
-	
-   # Callbacks	
-	earlycheckpoint = EarlyStopping(monitor = 'val_acc', min_delta = 0, 
-                      patience = earlychkpt_patience, verbose= 1 , mode = 'auto')	
-    
-	checkpointer = ModelCheckpoint(filepath= model_save_path + weights_model_name, 
-                               verbose=1, 
-                               save_best_only=True)
-							   
-    
-	# LearningRateScheduler
-	if poly_decay_lr == 'True' and step_decay_lr == 'True':
-	    raise Exception("Sorry, you can only use one LearningRateScheduler!!! Make sure only one is set to True in the config file")   
-	if poly_decay_lr == 'True':
-	    callbacks = [LearningRateScheduler(poly_decay),earlycheckpoint, checkpointer]
-    elif step_decay_lr == 'True':
-	    callbacks = [LearningRateScheduler(step_decay),earlycheckpoint, checkpointer]		
-    else:
-	    callbacks = [checkpointer]
-		
-	# define our set of callbacks and fit the model	
-    model.fit_generator(
-    	trainGen,
-    	steps_per_epoch=totalTrain // batch_size,
-    	validation_data=valGen,
-    	validation_steps=totalVal // batch_size,
-    	epochs=num_epochs,
-    	callbacks=callbacks,
-		verbose = 2)
-    	
-    
+        trainAug = ImageDataGenerator(
+        	rescale=1 / 255.0,
+        	fill_mode="nearest")
+         
+        # initialize the validation (and testing) data augmentation object
+        valAug = ImageDataGenerator(rescale=1 / 255.0)
+        
+        # initialize the training generator
+        trainGen = trainAug.flow_from_directory(
+        	train_path,
+        	class_mode=class_mode,
+        	target_size=(img_width,  img_height),
+        	shuffle=True,
+        	batch_size=batch_size)
+         
+        # initialize the validation generator
+        valGen = valAug.flow_from_directory(
+        	val_path,
+        	class_mode=class_mode,
+        	target_size=(img_width,  img_height),
+        	shuffle=False,
+        	batch_size=batch_size)
+         
+        # initialize the testing generator
+        testGen = valAug.flow_from_directory(
+        	test_path,
+        	class_mode=class_mode,
+        	target_size=(img_width,  img_height),
+        	shuffle=False,
+        	batch_size=batch_size)
+        
+        # initialize our ResNet model and compile it
+	    if model_name == 'inceptionv3':
+	        model = inception_architecture()
+	    elif model_name == 'resnet':
+	        model = resnet_architecture(version)	
+	    elif model_name == 'densenet':
+	        model = resnet_architecture(version)    
+	    elif model_name == 'mobilenet':
+	        model = mobilenet_architecture()
+        elif model_name == 'xception':
+	        model = xception_architecture()
+	    
+   #     Callbacks	
+	    earlycheckpoint = EarlyStopping(monitor = 'val_acc', min_delta = 0, 
+                          patience = earlychkpt_patience, verbose= 1 , mode = 'auto')	
+        
+	    checkpointer = ModelCheckpoint(filepath= model_save_path + weights_model_name, 
+                                   verbose=1, 
+                                   save_best_only=True)
+	    						   
+        
+	    # LearningRateScheduler
+	    if poly_decay_lr == 'True' and step_decay_lr == 'True':
+	        raise Exception("Sorry, you can only use one LearningRateScheduler!!! Make sure only one is set to True in the config file")   
+	    if poly_decay_lr == 'True':
+	        callbacks = [LearningRateScheduler(poly_decay),earlycheckpoint, checkpointer]
+        elif step_decay_lr == 'True':
+	        callbacks = [LearningRateScheduler(step_decay),earlycheckpoint, checkpointer]		
+        else:
+	        callbacks = [checkpointer]
+	    	
+	    # define our set of callbacks and fit the model	
+        model.fit_generator(
+        	trainGen,
+        	steps_per_epoch=totalTrain // batch_size,
+        	validation_data=valGen,
+        	validation_steps=totalVal // batch_size,
+        	epochs=num_epochs,
+        	callbacks=callbacks,
+	    	verbose = 2)
+        	
+        
