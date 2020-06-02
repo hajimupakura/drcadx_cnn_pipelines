@@ -8,6 +8,7 @@ from keras.layers import Dense, GlobalAveragePooling2D, Flatten, BatchNormalizat
 from keras.callbacks import ModelCheckpoint, TensorBoard, EarlyStopping
 from resources.config import app_config as config
 from imutils import paths
+from keras.callbacks import LearningRateScheduler
 from src.shared.util.learning_rate_scheduler import step_decay, poly_decay
 
 
@@ -30,23 +31,23 @@ def mobilenet_architecture():
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    model = Model(base_model.input, output)
+    mobilenet_model = Model(base_model.input, output)
 	
 	#Finetune or not
 	if fine_tune == 'True':
-	    for layer in model.layers:
+	    for layer in mobilenet_model.layers:
             layer.trainable=False
     else:
-	    for layer in model.layers[:layer_trainable_idx_point]:
+	    for layer in mobilenet_model.layers[:layer_trainable_idx_point]:
             layer.trainable=False
-        for layer in model.layers[layer_trainable_idx_point:]:
+        for layer in mobilenet_model.layers[layer_trainable_idx_point:]:
             layer.trainable=True
 	    
     # Getting the summary of architecture
     #mobilenet_model.summary()
     
     # Compiling the model
-    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    mobilenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
 
@@ -71,23 +72,23 @@ def inception_architecture():
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    model = Model(base_model.input, output)
+    inception_model = Model(base_model.input, output)
     
 	#Finetune or not
 	if fine_tune == 'True':
-	    for layer in model.layers:
+	    for layer in inception_model.layers:
             layer.trainable=False
     else:
-	    for layer in model.layers[:layer_trainable_idx_point]:
+	    for layer in inception_model.layers[:layer_trainable_idx_point]:
             layer.trainable=False
-        for layer in model.layers[layer_trainable_idx_point:]:
+        for layer in inception_model.layers[layer_trainable_idx_point:]:
             layer.trainable=True
 			
     # Summary of the model
     #inception_model.summary()
     
     # Compiling the model
-    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    inception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
     
@@ -112,23 +113,23 @@ def densenet_architecture(version):
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    model = Model(base_model.input, output)
+    densenet_model = Model(base_model.input, output)
     
 	#Finetune or not
 	if fine_tune == 'True':
-	    for layer in model.layers:
+	    for layer in densenet_model.layers:
             layer.trainable=False
     else:
-	    for layer in model.layers[:layer_trainable_idx_point]:
+	    for layer in densenet_model.layers[:layer_trainable_idx_point]:
             layer.trainable=False
-        for layer in model.layers[layer_trainable_idx_point:]:
+        for layer in densenet_model.layers[layer_trainable_idx_point:]:
             layer.trainable=True
 			
     # Summary of the model
     #inception_model.summary()
     
     # Compiling the model
-    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    densenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
     
@@ -153,23 +154,23 @@ def resnet_architecture(version):
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    model = Model(base_model.input, output)
+    resnet_model = Model(base_model.input, output)
     
 	#Finetune or not
 	if fine_tune == 'True':
-	    for layer in model.layers:
+	    for layer in resnet_model.layers:
             layer.trainable=False
     else:
-	    for layer in model.layers[:layer_trainable_idx_point]:
+	    for layer in resnet_model.layers[:layer_trainable_idx_point]:
             layer.trainable=False
-        for layer in model.layers[layer_trainable_idx_point:]:
+        for layer in resnet_model.layers[layer_trainable_idx_point:]:
             layer.trainable=True
 			
     # Summary of the model
     #inception_model.summary()
     
     # Compiling the model
-    densenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    resnet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                             loss = loss, 
                             metrics = ['accuracy'])
     
@@ -193,23 +194,23 @@ def xception_architecture():
     output = Dense(units = output_classes, activation = 'softmax')(x)
 
     # Creating the whole model
-    model = Model(base_model.input, output)
+    xception_model = Model(base_model.input, output)
     
 	#Finetune or not
 	if fine_tune == 'True':
-	    for layer in model.layers:
+	    for layer in xception_model.layers:
             layer.trainable=False
     else:
-	    for layer in model.layers[:layer_trainable_idx_point]:
+	    for layer in xception_model.layers[:layer_trainable_idx_point]:
             layer.trainable=False
-        for layer in model.layers[layer_trainable_idx_point:]:
+        for layer in xception_model.layers[layer_trainable_idx_point:]:
             layer.trainable=True
 			
     # Summary of the model
     #xception_model.summary()
     
     # Compiling the model
-    model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+    xception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
                            loss = loss, 
                            metrics = ['accuracy'])
 
@@ -222,15 +223,15 @@ def main(model_name, train_path, val_path, test_path, loss_func):
     
 	# Extract / Load dictionary
 	if model_name == 'inceptionv3':
-	    base_mod_dict = config['inceptionv3']
+	    base_mod_dict = config['default']['inceptionv3']
 	elif model_name == 'resnet':
-	    base_mod_dict = config['resnet']	
+	    base_mod_dict = config['default']['resnet']	
 	elif model_name == 'densenet':
-	    base_mod_dict = config['densenet']    
+	    base_mod_dict = config['default']['densenet']    
 	elif model_name == 'mobilenet':
-	    base_mod_dict = config['mobilenet']
+	    base_mod_dict = config['default']['mobilenet']
     elif model_name == 'xception':
-	    base_mod_dict = config['xception']
+	    base_mod_dict = config['default']['xception']
 		
 		
     # defining constants and variables
@@ -249,19 +250,11 @@ def main(model_name, train_path, val_path, test_path, loss_func):
 	step_decay_lr = base_mod_dict['step_decay_lr']
 	poly_decay_lr = base_mod_dict['poly_decay_lr']
 	earlychkpt_patience = base_mod_dict['earlychkpt_patience']
-    class_mode = base_mod_dict['class_mode'][0]
+    class_mode = base_mod_dict['class_mode']
     channels = base_mod_dict['channels']
     learning_rate = base_mod_dict['learning_rate']
+    loss = base_mod_dict['loss']
 	
-	# Loss
-	if loss_func == 'crossentropy':
-	    loss = base_mod_dict['loss'][0]
-	elif loss_func == 'binary_crossentropy':
-	    loss = base_mod_dict['loss'][1]
-		class_mode = base_mod_dict['class_mode'][0]
-	elif loss_func == 'categorical_crossentropy':
-	    loss = base_mod_dict['loss'][2]
-		class_mode = base_mod_dict['class_mode'][1]
 	# determine the # of image paths in training/validation/testing directories
     totalTrain = len(list(paths.list_images(train_path)))
     totalVal = len(list(paths.list_images(val_path)))

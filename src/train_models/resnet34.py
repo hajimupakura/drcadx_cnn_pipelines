@@ -43,9 +43,9 @@ def poly_decay(epoch):
 
 # determine the # of image paths in training/validation/testing directories
 config_path = config['resnet34'] 
-totalTrain = len(list(paths.list_images(config_path['train_path'])))
-totalVal = len(list(paths.list_images(config_path['val_path'])))
-totalTest = len(list(paths.list_images(config_path['test_path'])))
+totalTrain = len(list(paths.list_images(train_path)))
+totalVal = len(list(paths.list_images(val_path)))
+totalTest = len(list(paths.list_images(test_path)))
 
 # initialize the training data augmentation object
 # randomly shifts, translats, and flips each training sample
