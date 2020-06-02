@@ -324,24 +324,76 @@ def main(model_name, train_path, val_path, test_path, loss_func):
                                save_best_only=True)
 							   
     
-	# LearningRateScheduler
-	if poly_decay_lr == 'True' and step_decay_lr == 'True':
-	    raise Exception("Sorry, you can only use one LearningRateScheduler!!! Make sure only one is set to True in the config file")   
-	if poly_decay_lr == 'True':
-	    callbacks = [LearningRateScheduler(poly_decay),earlycheckpoint, checkpointer]
-    elif step_decay_lr == 'True':
-	    callbacks = [LearningRateScheduler(step_decay),earlycheckpoint, checkpointer]		
-    else:
-	    callbacks = [checkpointer]
-		
-	# define our set of callbacks and fit the model	
-    model.fit_generator(
-    	trainGen,
-    	steps_per_epoch=totalTrain // batch_size,
-    	validation_data=valGen,
-    	validation_steps=totalVal // batch_size,
-    	epochs=num_epochs,
-    	callbacks=callbacks,
-		verbose = 2)
-    	
-    
+        trainAug = ImageDataGenerator(
+        	rescale=1 / 255.0,
+        	fill_mode="nearest")
+         
+        # initialize the validation (and testing) data augmentation object
+        valAug = ImageDataGenerator(rescale=1 / 255.0)
+        
+        # initialize the training generator
+        trainGen = trainAug.flow_from_directory(
+        	train_path,
+        	class_mode=class_mode,
+        	target_size=(img_width,  img_height),
+        	shuffle=True,
+        	batch_size=batch_size)
+         
+        # initialize the validation generator
+        valGen = valAug.flow_from_directory(
+        	val_path,
+        	class_mode=class_mode,
+        	target_size=(img_width,  img_height),
+        	shuffle=False,
+        	batch_size=batch_size)
+         
+        # initialize the testing generator
+        testGen = valAug.flow_from_directory(
+        	test_path,
+        	class_mode=class_mode,
+        	target_size=(img_width,  img_height),
+        	shuffle=False,
+        	batch_size=batch_size)
+        
+        # initialize our ResNet model and compile it
+	    if model_name == 'inceptionv3':
+	        model = inception_architecture()
+	    elif model_name == 'resnet':
+	        model = resnet_architecture(version)	
+	    elif model_name == 'densenet':
+	        model = resnet_architecture(version)    
+	    elif model_name == 'mobilenet':
+	        model = mobilenet_architecture()
+        elif model_name == 'xception':
+	        model = xception_architecture()
+	    
+   #     Callbacks	
+	    earlycheckpoint = EarlyStopping(monitor = 'val_acc', min_delta = 0, 
+                          patience = earlychkpt_patience, verbose= 1 , mode = 'auto')	
+        
+	    checkpointer = ModelCheckpoint(filepath= model_save_path + weights_model_name, 
+                                   verbose=1, 
+                                   save_best_only=True)
+	    						   
+        
+	    # LearningRateScheduler
+	    if poly_decay_lr == 'True' and step_decay_lr == 'True':
+	        raise Exception("Sorry, you can only use one LearningRateScheduler!!! Make sure only one is set to True in the config file")   
+	    if poly_decay_lr == 'True':
+	        callbacks = [LearningRateScheduler(poly_decay),earlycheckpoint, checkpointer]
+        elif step_decay_lr == 'True':
+	        callbacks = [LearningRateScheduler(step_decay),earlycheckpoint, checkpointer]		
+        else:
+	        callbacks = [checkpointer]
+	    	
+	    # define our set of callbacks and fit the model	
+        model.fit_generator(
+        	trainGen,
+        	steps_per_epoch=totalTrain // batch_size,
+        	validation_data=valGen,
+        	validation_steps=totalVal // batch_size,
+        	epochs=num_epochs,
+        	callbacks=callbacks,
+	    	verbose = 2)
+        	
+        
