@@ -218,7 +218,7 @@ def xception_architecture():
 	
 # Actual Train
 
-def main(model_name, train_path, val_path, test_path, loss_func):
+def main(model_name, train_path, val_path, test_path):
     # model is the name of the model you want to use
     
 	# Extract / Load dictionary
