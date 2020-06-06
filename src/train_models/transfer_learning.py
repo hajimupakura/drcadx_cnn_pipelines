@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import sys
 import keras
 from keras.optimizers import *
 from keras.models import Model
@@ -13,7 +14,22 @@ from src.shared.util.learning_rate_scheduler import step_decay, poly_decay
 
 
 
-def mobilenet_architecture():
+
+	
+# Actual Train
+
+def main(model_name, train_path, val_path, test_path):
+    
+    if len(sys.argv) < 4:
+        print("Number of arguments less than 4. Please provide 4 arguments")
+        sys.exit()
+
+    model_name = sys.argv[1]
+    train_path = sys.argv[2]
+    test_path = sys.argv[3]
+    val_path = sys.argv[4]
+
+    def mobilenet_architecture():
     """
     Pre-build architecture of mobilenet for our dataset.
     """
@@ -54,172 +70,167 @@ def mobilenet_architecture():
     return mobilenet_model
 	
 	
-def inception_architecture():
-    """
-    Pre-build architecture of inception for our dataset.
-    """
-    # Imprting the model 
-    from keras.applications.inception_v3 import InceptionV3
+    def inception_architecture():
+        """
+        Pre-build architecture of inception for our dataset.
+        """
+        # Imprting the model 
+        from keras.applications.inception_v3 import InceptionV3
+        
+    	fine_tune = config['default']['inceptionv3']['fine_tune']
+    	layer_trainable_idx_point = config['default']['inceptionv3']['layer_trainable_idx_point']
+        # Pre-build model
+        base_model = InceptionV3(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
     
-	fine_tune = config['default']['inceptionv3']['fine_tune']
-	layer_trainable_idx_point = config['default']['inceptionv3']['layer_trainable_idx_point']
-    # Pre-build model
-    base_model = InceptionV3(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
-
-    # Adding output layers
-    x = base_model.output
-    x = GlobalAveragePooling2D()(x)
-    output = Dense(units = output_classes, activation = 'softmax')(x)
-
-    # Creating the whole model
-    inception_model = Model(base_model.input, output)
+        # Adding output layers
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        output = Dense(units = output_classes, activation = 'softmax')(x)
     
-	#Finetune or not
-	if fine_tune == 'True':
-	    for layer in inception_model.layers:
-            layer.trainable=False
-    else:
-	    for layer in inception_model.layers[:layer_trainable_idx_point]:
-            layer.trainable=False
-        for layer in inception_model.layers[layer_trainable_idx_point:]:
-            layer.trainable=True
-			
-    # Summary of the model
-    #inception_model.summary()
+        # Creating the whole model
+        inception_model = Model(base_model.input, output)
+        
+    	#Finetune or not
+    	if fine_tune == 'True':
+    	    for layer in inception_model.layers:
+                layer.trainable=False
+        else:
+    	    for layer in inception_model.layers[:layer_trainable_idx_point]:
+                layer.trainable=False
+            for layer in inception_model.layers[layer_trainable_idx_point:]:
+                layer.trainable=True
+    			
+        # Summary of the model
+        #inception_model.summary()
+        
+        # Compiling the model
+        inception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+                                loss = loss, 
+                                metrics = ['accuracy'])
+        
+        return inception_model
     
-    # Compiling the model
-    inception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
-                            loss = loss, 
-                            metrics = ['accuracy'])
+    def densenet_architecture(version):
+        """
+        Pre-build architecture of inception for our dataset.
+        """
+    	densenet_version = "Densenet" + version
+        # Imprting the model 
+        from keras.applications.densenet import densenet_version
+        
+    	fine_tune = config['default']['densenet']['fine_tune']
+    	layer_trainable_idx_point = config['default']['densenet']['layer_trainable_idx_point']
+        # Pre-build model
+        base_model = densenet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
     
-    return inception_model
-
-def densenet_architecture(version):
-    """
-    Pre-build architecture of inception for our dataset.
-    """
-	densenet_version = "Densenet" + version
-    # Imprting the model 
-    from keras.applications.densenet import densenet_version
+        # Adding output layers
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        output = Dense(units = output_classes, activation = 'softmax')(x)
     
-	fine_tune = config['default']['densenet']['fine_tune']
-	layer_trainable_idx_point = config['default']['densenet']['layer_trainable_idx_point']
-    # Pre-build model
-    base_model = densenet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
-
-    # Adding output layers
-    x = base_model.output
-    x = GlobalAveragePooling2D()(x)
-    output = Dense(units = output_classes, activation = 'softmax')(x)
-
-    # Creating the whole model
-    densenet_model = Model(base_model.input, output)
+        # Creating the whole model
+        densenet_model = Model(base_model.input, output)
+        
+    	#Finetune or not
+    	if fine_tune == 'True':
+    	    for layer in densenet_model.layers:
+                layer.trainable=False
+        else:
+    	    for layer in densenet_model.layers[:layer_trainable_idx_point]:
+                layer.trainable=False
+            for layer in densenet_model.layers[layer_trainable_idx_point:]:
+                layer.trainable=True
+    			
+        # Summary of the model
+        #inception_model.summary()
+        
+        # Compiling the model
+        densenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+                                loss = loss, 
+                                metrics = ['accuracy'])
+        
+        return densenet_model
+    	
+    def resnet_architecture(version):
+        """
+        Pre-build architecture of inception for our dataset.
+        """
+    	resnet_version = "Resnet" + version
+        # Imprting the model 
+        from keras.applications.densenet import resnet_version
+        
+    	fine_tune = config['default']['resnet']['fine_tune']
+    	layer_trainable_idx_point = config['default']['resnet']['layer_trainable_idx_point']
+        # Pre-build model
+        model = resnet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
     
-	#Finetune or not
-	if fine_tune == 'True':
-	    for layer in densenet_model.layers:
-            layer.trainable=False
-    else:
-	    for layer in densenet_model.layers[:layer_trainable_idx_point]:
-            layer.trainable=False
-        for layer in densenet_model.layers[layer_trainable_idx_point:]:
-            layer.trainable=True
-			
-    # Summary of the model
-    #inception_model.summary()
+        # Adding output layers
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        output = Dense(units = output_classes, activation = 'softmax')(x)
     
-    # Compiling the model
-    densenet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
-                            loss = loss, 
-                            metrics = ['accuracy'])
+        # Creating the whole model
+        resnet_model = Model(base_model.input, output)
+        
+    	#Finetune or not
+    	if fine_tune == 'True':
+    	    for layer in resnet_model.layers:
+                layer.trainable=False
+        else:
+    	    for layer in resnet_model.layers[:layer_trainable_idx_point]:
+                layer.trainable=False
+            for layer in resnet_model.layers[layer_trainable_idx_point:]:
+                layer.trainable=True
+    			
+        # Summary of the model
+        #inception_model.summary()
+        
+        # Compiling the model
+        resnet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+                                loss = loss, 
+                                metrics = ['accuracy'])
+        
+        return densenet_model	
     
-    return densenet_model
-	
-def resnet_architecture(version):
-    """
-    Pre-build architecture of inception for our dataset.
-    """
-	resnet_version = "Resnet" + version
-    # Imprting the model 
-    from keras.applications.densenet import resnet_version
+    def xception_architecture():
+        """
+        Pre-build architecture of inception for our dataset.
+        """
+        # Imprting the model
+        from keras.applications.xception import Xception
+        
+    	fine_tune = config['default']['xception']['fine_tune']
+    	layer_trainable_idx_point = config['default']['xception']['layer_trainable_idx_point']
+        # Pre-build model
+        base_model = Xception(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
     
-	fine_tune = config['default']['resnet']['fine_tune']
-	layer_trainable_idx_point = config['default']['resnet']['layer_trainable_idx_point']
-    # Pre-build model
-    model = resnet_version(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
-
-    # Adding output layers
-    x = base_model.output
-    x = GlobalAveragePooling2D()(x)
-    output = Dense(units = output_classes, activation = 'softmax')(x)
-
-    # Creating the whole model
-    resnet_model = Model(base_model.input, output)
+        # Adding output layers
+        x = base_model.output
+        x = GlobalAveragePooling2D()(x)
+        output = Dense(units = output_classes, activation = 'softmax')(x)
     
-	#Finetune or not
-	if fine_tune == 'True':
-	    for layer in resnet_model.layers:
-            layer.trainable=False
-    else:
-	    for layer in resnet_model.layers[:layer_trainable_idx_point]:
-            layer.trainable=False
-        for layer in resnet_model.layers[layer_trainable_idx_point:]:
-            layer.trainable=True
-			
-    # Summary of the model
-    #inception_model.summary()
+        # Creating the whole model
+        xception_model = Model(base_model.input, output)
+        
+    	#Finetune or not
+    	if fine_tune == 'True':
+    	    for layer in xception_model.layers:
+                layer.trainable=False
+        else:
+    	    for layer in xception_model.layers[:layer_trainable_idx_point]:
+                layer.trainable=False
+            for layer in xception_model.layers[layer_trainable_idx_point:]:
+                layer.trainable=True
+    			
+        # Summary of the model
+        #xception_model.summary()
+        
+        # Compiling the model
+        xception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
+                               loss = loss, 
+                               metrics = ['accuracy'])
     
-    # Compiling the model
-    resnet_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
-                            loss = loss, 
-                            metrics = ['accuracy'])
-    
-    return densenet_model	
-
-def xception_architecture():
-    """
-    Pre-build architecture of inception for our dataset.
-    """
-    # Imprting the model
-    from keras.applications.xception import Xception
-    
-	fine_tune = config['default']['xception']['fine_tune']
-	layer_trainable_idx_point = config['default']['xception']['layer_trainable_idx_point']
-    # Pre-build model
-    base_model = Xception(include_top = False, weights = None, input_shape = (img_width, img_height, channels))
-
-    # Adding output layers
-    x = base_model.output
-    x = GlobalAveragePooling2D()(x)
-    output = Dense(units = output_classes, activation = 'softmax')(x)
-
-    # Creating the whole model
-    xception_model = Model(base_model.input, output)
-    
-	#Finetune or not
-	if fine_tune == 'True':
-	    for layer in xception_model.layers:
-            layer.trainable=False
-    else:
-	    for layer in xception_model.layers[:layer_trainable_idx_point]:
-            layer.trainable=False
-        for layer in xception_model.layers[layer_trainable_idx_point:]:
-            layer.trainable=True
-			
-    # Summary of the model
-    #xception_model.summary()
-    
-    # Compiling the model
-    xception_model.compile(optimizer = keras.optimizers.Adam(lr = learning_rate), 
-                           loss = loss, 
-                           metrics = ['accuracy'])
-
-    return xception_model
-	
-# Actual Train
-
-def main(model_name, train_path, val_path, test_path):
-    # model is the name of the model you want to use
+        return xception_model  
     
 	# Extract / Load dictionary
 	if model_name == 'inceptionv3':

@@ -9,10 +9,9 @@ from automation.bash_scripts import
 
 class TransferLearningTask():
     def __init__(self,
-                 transfer_learning,
-                 validation):
+                 transfer_learning):
         self.task_transfer_learning = transfer_learning
-        self.Task_validation = validation
+        #self.Task_validation = validation
 
 model_name = Variable.get('model_name')
 train_path = Variable.get('tl_train_path')
@@ -20,7 +19,7 @@ test_path = Variable.get('tl_test_path')
 val_path = Variable.get('tl_val_path')
 
 def createTransferLearningTasks(params, default_args):
-    train_model_tl = PyrhonOperator(
+    train_model_tl = PythonOperator(
         task_id = 'train_model',
         python_callable = transfer_learning,
         provide_context=True,
@@ -31,11 +30,11 @@ def createTransferLearningTasks(params, default_args):
         default_args=default_args
     )
 
-    validation = BashOperator(
-        task_id = 'validation',
-        bash_command = 'to_follow',
-        params=params,
-        default_args = default_args
-    )
+    # validation = BashOperator(
+    #     task_id = 'validation',
+    #     bash_command = 'to_follow',
+    #     params=params,
+    #     default_args = default_args
+    # )
 
-    return TransferLearningTask(transfer_learning, validation)
+    return TransferLearningTask(transfer_learning)

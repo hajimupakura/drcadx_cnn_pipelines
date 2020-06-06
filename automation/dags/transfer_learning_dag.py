@@ -38,6 +38,16 @@ def createTransferLearningDAG(params):
     dag_tasks =  createTransferLearningTasks(params, default_args)
 
     print('Sequencing the Transfer Learning Tasks')
-    dag >> dag_tasks.transfer_learning >> dag_tasks.validation
+    dag >> dag_tasks.transfer_learning
+    # >> dag_tasks.validation
 
-    return dag         
+    return dag
+
+    params = {
+        'model_name': Variable,get("model_name"),
+        'train_path': Variable,get("train_path"),
+        'test_path': Variable,get("test_path"),
+        'val_path': Variable,get("val_path")
+    }
+
+    dag =  createTransferLearningDAG(params)      
