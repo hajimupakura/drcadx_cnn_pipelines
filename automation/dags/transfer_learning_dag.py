@@ -6,6 +6,7 @@ from automation.manifest.manifest_prod import env as master_env
 from src.shared.util import dict_merge
 from automation.factories.demo_factory import createTransferLearningTasks
 
+
 def createTransferLearningDAG(params):
     today = datetime,now().strftime("%Y%m%d")
     print("Creating Transfer Learning DAG for ", today)
@@ -42,6 +43,7 @@ def createTransferLearningDAG(params):
     # >> dag_tasks.validation
 
     return dag
+    
 
     params = {
         'model_name': Variable,get("model_name"),
