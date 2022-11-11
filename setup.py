@@ -19,7 +19,7 @@ setup(
     description="Top Recipes",
     install_requires=[
         "py4j==0.10.4",
-        "pyspark==2.2.0",
+        "pyspark==3.2.2",
             ],
     packages=find_packages(),
 )
